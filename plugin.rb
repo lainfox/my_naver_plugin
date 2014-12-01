@@ -40,7 +40,7 @@ class OmniAuth::Strategies::Naver < OmniAuth::Strategies::OAuth2
   end
 
   def raw_info
-    @raw_info ||= access_token.get('/oauth/me.json').parsed
+    @raw_info ||= access_token.get('/oauth2.0/token').parsed
   end
 end
 
