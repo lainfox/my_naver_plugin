@@ -1,52 +1,70 @@
-require 'auth/oauth2_authenticator'
-require 'omniauth-oauth2'
+# name: naver.com
+# about: Authenticate with discourse with naver.com
+# version: 0.1.0
+# author: Sam Saffron
 
-class NaverAuthenticator < ::Auth::OAuth2Authenticator
+gem 'omniauth-naver', '0.0.1'
 
-  CLIENT_ID = '44yeBG7tWFEpg9Zso8_q'
-  CLIENT_SECRET = 'Y4PjI0GKpt'
+
+class NaverAuthenticator < ::Auth::Authenticator
+  
+  def name
+    'naver'
+  end
+
+  def after_authenticate(auth_token)
+    result = Auth::Result.new
+
+    # grap the info we need from omni auth
+    data = auth_token[:info]
+    raw_info = auth_token["extra"]["raw_info"]
+    name = data["name"]
+    naver_uid = auth_token["uid"]
+
+    # plugin specific data storage
+    current_info = ::PluginStore.get("naver", "naver_uid_#{naver_uid}")
+
+    result.user =
+      if current_info
+        User.where(id: current_info[:user_id]).first
+      end
+
+    result.name = name
+    result.extra_data = { naver_uid: naver_uid }
+
+    result
+  end
+
+  def after_create_account(user, auth)
+    data = auth[:extra_data]
+    ::PluginStore.set("naver", "naver_uid_#{data[:naver_uid]}", {user_id: user.id })
+  end
 
   def register_middleware(omniauth)
-    omniauth.provider :naver, CLIENT_ID, CLIENT_SECRET
+    omniauth.provider :naver, :setup => lambda { |env|
+      strategy = env['omniauth.strategy']
+      strategy.options[:client_id] = SiteSetting.naver_client_id
+      strategy.options[:client_secret] = SiteSetting.naver_client_secret
+    }
   end
 end
 
-class OmniAuth::Strategies::Naver < OmniAuth::Strategies::OAuth2
-  # Give your strategy a name.
-  option :name, "naver"
 
-  # This is where you pass the options you would pass when
-  # initializing your consumer from the OAuth gem.
-  option :client_options, site: 'https://nid.naver.com/oauth2.0/authorize'
+auth_provider :frame_width => 920,
+              :frame_height => 800,
+              :authenticator => NaverAuthenticator.new
 
-  # These are called after authentication has succeeded. If
-  # possible, you should try to set the UID without making
-  # additional calls (if the user id is returned with the token
-  # or as a URI parameter). This may not be possible with all
-  # providers.
-  uid { raw_info['id'].to_s }
 
-  info do
-    {
-      :name => raw_info['name'],
-      :email => raw_info['email']
-    }
-  end
+# We ship with zocial, it may have an icon you like http://zocial.smcllns.com/sample.html
+#  in our current case we have an icon for naver
+register_css <<CSS
 
-  extra do
-    {
-      'raw_info' => raw_info
-    }
-  end
+.btn-social.naver {
+  background: #1ec800;
+}
+.btn-social.naver:before {
+	font-family: 'arial',
+  content: "N";
+}
 
-  def raw_info
-    @raw_info ||= access_token.get('/oauth2.0/token').parsed
-  end
-end
-
-auth_provider :title => '네이버로 로그인',
-    :message => '네이버 계정을 통한 로그인. (팝업을 해제해야 할 수도 있어요.)',
-    :frame_width => 920,
-    :frame_height => 800,
-    :authenticator => NaverAuthenticator.new('naver', trusted: true,
-      auto_create_account: true)
+CSS
