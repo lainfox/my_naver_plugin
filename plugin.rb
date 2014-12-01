@@ -1,24 +1,52 @@
-# name: Naver video Onebox
-# version: 0.1
-# authors: Lainfox
+require 'auth/oauth2_authenticator'
+require 'omniauth-oauth2'
 
-# Naver URL 주소로는 outkey를 생성해야 해서 iframe 이 불가능. 
-# iframe 내의 src 를 입력했을때 iframe 나오는 것만 함.
-# <iframe src='http://serviceapi.rmcnmv.naver.com/flash/outKeyPlayer.nhn?vid=476FB10E64EE7A20C9046B03146A41CC951D&outKey=V12414d21883f4aff0538264feef201e046b6fecd5fe9d7b48a5b264feef201e046b6&controlBarMovable=true&jsCallable=true&isAutoPlay=true&skinName=tvcast_white' frameborder='no' scrolling='no' marginwidth='0' marginheight='0' WIDTH='544' HEIGHT='306'></iframe>
+class NaverAuthenticator < ::Auth::OAuth2Authenticator
 
-Onebox = Onebox
+  CLIENT_ID = '44yeBG7tWFEpg9Zso8_q'
+  CLIENT_SECRET = 'Y4PjI0GKpt'
 
-module Onebox
-	module Engine
-		class NaverVideoOnebox
-			include Engine
-			REGEX = /^https?:\/\/(?:serviceapi\.)?(?:rmcnmv\.)?(?:naver\.com\/flash\/outKeyPlayer.nhn?)\S*$/
-			matches_regexp REGEX
-
-			def to_html
-				"<div class='naver-video'><iframe src='#{@url}'' width='640' height='360' frameborder='0' allowfullscreen></iframe><p>via <a href='#{@url}'>#{@url}</a></p></div>"
-			end
-
-		end
-	end	
+  def register_middleware(omniauth)
+    omniauth.provider :naver, CLIENT_ID, CLIENT_SECRET
+  end
 end
+
+class OmniAuth::Strategies::Naver < OmniAuth::Strategies::OAuth2
+  # Give your strategy a name.
+  option :name, "naver"
+
+  # This is where you pass the options you would pass when
+  # initializing your consumer from the OAuth gem.
+  option :client_options, site: 'http://www.jumak.net'
+
+  # These are called after authentication has succeeded. If
+  # possible, you should try to set the UID without making
+  # additional calls (if the user id is returned with the token
+  # or as a URI parameter). This may not be possible with all
+  # providers.
+  uid { raw_info['id'].to_s }
+
+  info do
+    {
+      :name => raw_info['name'],
+      :email => raw_info['email']
+    }
+  end
+
+  extra do
+    {
+      'raw_info' => raw_info
+    }
+  end
+
+  def raw_info
+    @raw_info ||= access_token.get('/oauth/me.json').parsed
+  end
+end
+
+auth_provider :title => '네이버로 로그인',
+    :message => '네이버 계정을 통한 로그인. (팝업을 해제해야 할 수도 있어요.)',
+    :frame_width => 920,
+    :frame_height => 800,
+    :authenticator => NaverAuthenticator.new('naver', trusted: true,
+      auto_create_account: true)
