@@ -12,7 +12,7 @@ module Onebox
 	module Engine
 		class NaverVideoOnebox
 			include Engine
-			REGEX = /^https?:\/\/(?:serviceapi\.)?(?:rmcnmv\.)?(?:naver\.com\/flash\/outKeyPlayer.nhn?)\S+$/
+			REGEX = /^https?:\/\/(?:serviceapi\.)?(?:rmcnmv\.)?(?:naver\.com\/flash\/outKeyPlayer.nhn?)\S*$/
 			matches_regexp REGEX
 
 			def to_html
