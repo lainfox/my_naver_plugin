@@ -17,7 +17,7 @@ class OmniAuth::Strategies::Naver < OmniAuth::Strategies::OAuth2
 
   # This is where you pass the options you would pass when
   # initializing your consumer from the OAuth gem.
-  option :client_options, site: 'http://www.jumak.net'
+  option :client_options, site: 'https://nid.naver.com/oauth2.0/authorize'
 
   # These are called after authentication has succeeded. If
   # possible, you should try to set the UID without making
