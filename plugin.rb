@@ -1,9 +1,9 @@
 # name: naver.com
 # about: Authenticate with discourse with naver.com
 # version: 0.1.0
-# author: Sam Saffron
+# author: - lainfox
 
-gem 'omniauth-naver', '0.0.1'
+gem 'omniauth-naver'
 
 
 class NaverAuthenticator < ::Auth::Authenticator
