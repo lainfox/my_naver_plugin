@@ -1,13 +1,12 @@
-# name: omniauth-naver-discourse
-# about: Authenticate with discourse with naver.com
+# name: Naver login
+# about: Authenticate with discourse with naver.
 # version: 0.1.0
 # author: lainfox
 
 gem 'omniauth-naver'
 
-
 class NaverAuthenticator < ::Auth::Authenticator
-  
+
   def name
     'naver'
   end
@@ -15,15 +14,13 @@ class NaverAuthenticator < ::Auth::Authenticator
   def after_authenticate(auth_token)
     result = Auth::Result.new
 
-    # grap the info we need from omni auth
-    data = auth_token[:info]    
+    data = auth_token[:info]
+    credentials = auth_token[:credentials]
+    raw_info = auth_token[:extra][:raw_info]
     name = data[:name]
     username = data[:nickname]
     naver_uid = auth_token[:uid]
-    email = data[:email]
-    raw_info = auth_token[:extra][:raw_info]
 
-    # plugin specific data storage
     current_info = ::PluginStore.get('naver', "naver_uid_#{naver_uid}")
 
     result.user =
@@ -32,15 +29,15 @@ class NaverAuthenticator < ::Auth::Authenticator
       end
 
     result.name = name
-    result.extra_data = { naver_uid: naver_uid }
-    result.email = email
+    result.username = username
+    result.extra_data = { naver_uid: naver_uid, raw_info: raw_info }
 
     result
   end
 
   def after_create_account(user, auth)
-    data = auth[:extra_data]
-    ::PluginStore.set('naver', "naver_uid_#{data[:naver_uid]}", {user_id: user.id })
+    naver_uid = auth[:uid]
+    ::PluginStore.set('naver', "naver_uid_#{naver_uid}", {user_id: user.id})
   end
 
   def register_middleware(omniauth)
@@ -52,18 +49,14 @@ class NaverAuthenticator < ::Auth::Authenticator
   end
 end
 
-
-auth_provider :frame_width => 920,
-              :frame_height => 800,
+auth_provider :frame_width => 380,
+              :frame_height => 460,
               :authenticator => NaverAuthenticator.new
 
-
-# We ship with zocial, it may have an icon you like http://zocial.smcllns.com/sample.html
-#  in our current case we have an icon for naver
 register_css <<CSS
 
 .btn-social.naver {
-  background: #1ec800;
+  background: "#1ec800";
 }
 
 .btn-social.naver:before {
