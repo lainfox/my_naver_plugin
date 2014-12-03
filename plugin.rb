@@ -6,7 +6,7 @@
 gem 'omniauth-naver'
 
 
-class NaverAuth < ::Auth::Authenticator
+class NaverAuthenticator < ::Auth::Authenticator
   
   def name
     'naver'
@@ -53,22 +53,20 @@ class NaverAuth < ::Auth::Authenticator
 end
 
 
-auth_provider :title => 'with Naver',
-    :message => '네이버로 로그인 합니다.(팝업을 풀어야 할 수도 있어요)',
-    :frame_width => 920,
-    :frame_height => 800,
-    :authenticator => NaverAuth.new
+auth_provider :frame_width => 920,
+              :frame_height => 800,
+              :authenticator => NaverAuthenticator.new
 
 
 # We ship with zocial, it may have an icon you like http://zocial.smcllns.com/sample.html
 #  in our current case we have an icon for naver
 register_css <<CSS
 
-.btn-social.vkontakte {
+.btn-social.naver {
   background: #1ec800;
 }
 
-.btn-social.vkontakte:before {
+.btn-social.naver:before {
   font-family:"arial",
   content: "N";
 }

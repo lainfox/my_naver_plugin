@@ -1,0 +1,6 @@
+# encoding: utf-8
+
+ko:
+  site_settings:
+    naver_client_id: "client 아이디, http://developer.naver.com/"
+    naver_client_secret: "client 시크릿 키, http://developer.naver.com/"
