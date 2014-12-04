@@ -1,9 +1,9 @@
-# name: Naver login
-# about: Authenticate with discourse with naver.
+# name: naver.com
+# about: Authenticate with discourse with naver.com, see more at: http://developer.naver.com/wiki/pages/NaverLogin
 # version: 0.1.0
 # author: lainfox
 
-gem 'omniauth-naver'
+gem 'omniauth-naver', '~> 0.0.1'
 
 class NaverAuthenticator < ::Auth::Authenticator
 
@@ -14,14 +14,14 @@ class NaverAuthenticator < ::Auth::Authenticator
   def after_authenticate(auth_token)
     result = Auth::Result.new
 
+    # grap the info we need from omni auth
     data = auth_token[:info]
-    credentials = auth_token[:credentials]
-    raw_info = auth_token[:extra][:raw_info]
-    name = data[:name]
-    username = data[:nickname]
-    naver_uid = auth_token[:uid]
+    raw_info = auth_token["extra"]["raw_info"]
+    name = data["name"]
+    naver_uid = auth_token["uid"]
 
-    current_info = ::PluginStore.get('naver', "naver_uid_#{naver_uid}")
+    # plugin specific data storage
+    current_info = ::PluginStore.get("naver", "naver_uid_#{naver_uid}")
 
     result.user =
       if current_info
@@ -29,15 +29,14 @@ class NaverAuthenticator < ::Auth::Authenticator
       end
 
     result.name = name
-    result.username = username
-    result.extra_data = { naver_uid: naver_uid, raw_info: raw_info }
+    result.extra_data = { naver_uid: naver_uid }
 
     result
   end
 
   def after_create_account(user, auth)
-    naver_uid = auth[:uid]
-    ::PluginStore.set('naver', "naver_uid_#{naver_uid}", {user_id: user.id})
+    data = auth[:extra_data]
+    ::PluginStore.set("naver", "naver_uid_#{data[:naver_uid]}", {user_id: user.id })
   end
 
   def register_middleware(omniauth)
@@ -49,14 +48,18 @@ class NaverAuthenticator < ::Auth::Authenticator
   end
 end
 
-auth_provider :frame_width => 380,
-              :frame_height => 460,
+
+auth_provider :frame_width => 920,
+              :frame_height => 800,
               :authenticator => NaverAuthenticator.new
+
+# We ship with zocial, it may have an icon you like http://zocial.smcllns.com/sample.html
+#  in our current case we have an icon for vk
 
 register_css <<CSS
 
 .btn-social.naver {
-  background: "#1ec800";
+  background: #1ec800;
 }
 
 .btn-social.naver:before {
