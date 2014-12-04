@@ -1,5 +1,8 @@
-# name: naver.com
-# about: Authenticate with discourse with naver.com, see more at: http://developer.naver.com/wiki/pages/NaverLogin
-# version: 0.1.0
-# author: lainfox
+# uses server side to ensure markdown pipeline on the server knows about it
+register_css <<CSS
 
+.body {
+  background: #fafafa;
+}
+
+CSS
