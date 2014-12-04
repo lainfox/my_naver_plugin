@@ -1,5 +1,5 @@
 login:
-  naver_client_id:
+  douban_client_id:
     default: ''
-  naver_client_secret:
+  douban_client_secret:
     default: ''

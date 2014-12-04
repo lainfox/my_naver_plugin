@@ -2,5 +2,5 @@
 
 en:
   site_settings:
-    naver_client_id: "Client id for Naver authentication, http://developer.naver.com/"
-    naver_client_secret: "Client secret for Naver authentication, http://developer.naver.com/"
+    douban_client_id: "Client id for Douban authentication, registered at http://developers.douban.com/"
+    douban_client_secret: "Client secret for Douban authentication, registered at http://developers.douban.com/"

@@ -1,0 +1,6 @@
+# encoding: utf-8
+
+zh_CN:
+  site_settings:
+    douban_client_id: "豆瓣帐号验证的客户端帐号（Client id），到 http://developers.douban.com/ 来注册获取"
+    douban_client_secret: "豆瓣帐号验证的客户端密码（Client secret），到 http://developers.douban.com/ 来注册获取"
