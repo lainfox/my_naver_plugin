@@ -3,7 +3,7 @@
 # version: 0.1.0
 # author: lainfox
 
-gem 'omniauth-naver', '~> 0.0.1'
+#gem 'omniauth-naver', '~> 0.0.1'
 
 class NaverAuthenticator < ::Auth::Authenticator
 
